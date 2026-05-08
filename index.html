@@ -1,24 +1,14 @@
-<!doctype html>
-<html>
-    <head> 
-        <meta charset="UTF-8"> 
-        <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1"> 
-        <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-        <title>EARNING APP 12</title>
-    </head> 
-    <body> 
-        <h1>EARNING APP 12</h1>
-        <div>
-            Hello World! 
-        </div>  
-    </body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoinEarn Pro | Premium Earning Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --primary: #ffcc00;
@@ -28,230 +18,81 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --text: #ffffff;
             --text-dim: #a0a0a0;
-            --success: #00ff88;
-            --error: #ff4d4d;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        #bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .floating-coin {
-            position: absolute;
-            color: var(--primary);
-            opacity: 0.2;
-            animation: float 10s linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(110vh) rotate(0deg); }
-            100% { transform: translateY(-10vh) rotate(360deg); }
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 100px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .profile-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), #ff8800);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #000;
-        }
-
-        .wallet-card {
-            background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(0, 0, 0, 0.4));
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 25px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .coin-balance {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--primary);
-            margin: 5px 0;
-        }
-
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .card:active { transform: scale(0.95); }
-
-        .card i { font-size: 28px; color: var(--primary); margin-bottom: 10px; display: block; }
-
-        .btn-main {
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary), #ffa200);
-            color: #000;
-            border: none;
-            padding: 18px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .btn-main:disabled { background: #444; color: #888; cursor: not-allowed; }
-
-        .stats-bar { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 20px; }
-
-        .progress-container { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 8px; }
-
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.5s; }
-
-        /* Modal Fixes */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none; justify-content: center; align-items: center;
-            z-index: 1000; padding: 20px;
-        }
-
-        .modal-content {
-            background: #1a1a1c; border: 1px solid var(--glass-border);
-            padding: 30px; border-radius: 25px; text-align: center; width: 100%; max-width: 350px;
-        }
-
-        #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: #000; padding: 10px 20px;
-            border-radius: 50px; font-weight: bold; display: none; z-index: 2000;
-        }
-
-        .wheel-container {
-            width: 180px; height: 180px; border: 5px solid var(--primary);
-            border-radius: 50%; margin: 20px auto;
-            transition: 3s cubic-bezier(0.1, 0, 0.1, 1);
-            background: conic-gradient(#ffcc00 0deg 60deg, #222 60deg 120deg, #ffcc00 120deg 180deg, #222 180deg 240deg, #ffcc00 240deg 300deg, #222 300deg 360deg);
-        }
-
-        .scratch-area {
-            width: 100%; height: 120px; background: #333; border-radius: 15px;
-            margin: 20px 0; position: relative; display: flex; align-items: center; justify-content: center;
-        }
-
-        .scratch-cover {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #888; border-radius: 15px; transition: 0.5s;
-        }
-
-        .ad-loader {
-            border: 4px solid #333; border-top: 4px solid var(--primary);
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: spin 1s linear infinite; margin: 20px auto;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        
+        /* Auth Styles */
+        .auth-screen { display: flex; flex-direction: column; gap: 15px; margin-top: 50px; }
+        input { width: 100%; padding: 15px; background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 12px; color: white; margin-bottom: 10px; }
+        
+        .wallet-card { background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(0, 0, 0, 0.4)); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 20px; border: 1px solid var(--glass-border); }
+        .coin-balance { font-size: 42px; font-weight: 800; color: var(--primary); }
+        
+        .btn-main { width: 100%; background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-secondary { background: transparent; border: 1px solid var(--primary); color: var(--primary); width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; text-align: center; }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1a1a1c; padding: 30px; border-radius: 25px; width: 90%; max-width: 400px; }
+        
+        #admin-panel { display: none; background: #111; padding: 20px; border-top: 2px solid var(--primary); margin-top: 30px; border-radius: 20px; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 10px 20px; border-radius: 50px; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="bg-animation"></div>
-
     <div class="container">
-        <header>
-            <div class="profile-section">
-                <div class="avatar">JD</div>
+        <div id="auth-container" class="auth-screen">
+            <h1 style="text-align: center; color: var(--primary);">CoinEarn Pro</h1>
+            <div id="login-form">
+                <h3>Login</h3>
+                <input type="email" id="login-email" placeholder="Email">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button class="btn-main" onclick="handleLogin()">Login</button>
+                <p onclick="toggleAuth()" style="text-align: center; margin-top: 15px; cursor: pointer; color: var(--text-dim);">New user? Signup</p>
+            </div>
+            <div id="signup-form" style="display: none;">
+                <h3>Sign Up</h3>
+                <input type="text" id="signup-name" placeholder="Full Name">
+                <input type="email" id="signup-email" placeholder="Email">
+                <input type="password" id="signup-pass" placeholder="Password">
+                <button class="btn-main" onclick="handleSignup()">Create Account</button>
+                <p onclick="toggleAuth()" style="text-align: center; margin-top: 15px; cursor: pointer; color: var(--text-dim);">Already have an account? Login</p>
+            </div>
+        </div>
+
+        <div id="main-app" style="display: none;">
+            <header style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                 <div>
-                    <h4>Guest User</h4>
-                    <p style="font-size: 11px; color: var(--text-dim);">ID: 882931</p>
+                    <h4 id="user-name-display">Welcome</h4>
+                    <p style="font-size: 12px; color: var(--text-dim);">Status: Active</p>
                 </div>
-            </div>
-            <div style="color: var(--primary); font-weight: bold;">Leaderboard</div>
-        </header>
+                <button onclick="handleLogout()" style="background: none; border: none; color: red;">Logout</button>
+            </header>
 
-        <div class="wallet-card">
-            <p style="color: var(--text-dim); font-size: 12px;">TOTAL BALANCE</p>
-            <div class="coin-balance" id="coin-display">0</div>
-            <div class="rupee-balance" id="rupee-display">₹0.00</div>
-            <button class="btn-main" onclick="openWithdraw()" style="margin: 15px 0 0 0; padding: 10px; font-size: 14px; width: auto;">Withdraw</button>
-        </div>
+            <div class="wallet-card">
+                <p>TOTAL BALANCE</p>
+                <div class="coin-balance" id="coin-display">0</div>
+                <div id="rupee-display">₹0.00</div>
+                <button class="btn-main" onclick="openWithdraw()" style="width: auto; padding: 10px 30px;">Withdraw</button>
+            </div>
 
-        <div class="stats-bar">
-            <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                <span>Goal (₹50)</span>
-                <span id="progress-percent">0%</span>
+            <div class="action-grid">
+                <div class="card" onclick="dailyBonus()"><i class="fas fa-gift"></i><p>Daily</p></div>
+                <div class="card" onclick="watchAd()"><i class="fas fa-video"></i><p>Ads</p></div>
             </div>
-            <div class="progress-container"><div class="progress-fill" id="main-progress"></div></div>
-        </div>
 
-        <button class="btn-main" id="ad-btn" onclick="watchAd()">Watch Ad & Earn 10 Coins</button>
-
-        <div class="action-grid">
-            <div class="card" onclick="dailyBonus()">
-                <i class="fas fa-gift"></i>
-                <h3>Daily Bonus</h3>
-                <p>+50 Coins</p>
-            </div>
-            <div class="card" onclick="openSpin()">
-                <i class="fas fa-dharmachakra"></i>
-                <h3>Lucky Spin</h3>
-                <p>Up to 100</p>
-            </div>
-            <div class="card" onclick="openScratch()">
-                <i class="fas fa-magic"></i>
-                <h3>Scratch</h3>
-                <p>Try Luck</p>
-            </div>
-            <div class="card" onclick="showToast('Referral coming soon!')">
-                <i class="fas fa-users"></i>
-                <h3>Refer</h3>
-                <p>Earn ₹5</p>
+            <div id="admin-panel">
+                <h3 style="color: var(--primary);">Admin Controls</h3>
+                <input type="email" id="target-email" placeholder="User Email">
+                <input type="number" id="add-coins-amount" placeholder="Coins (+/-)">
+                <button class="btn-main" onclick="adminAddCoins()">Give Coins</button>
+                <button class="btn-secondary" style="border-color: red; color: red;" onclick="adminBanUser()">Ban User</button>
             </div>
         </div>
     </div>
@@ -259,165 +100,173 @@
     <div id="generic-modal" class="modal">
         <div class="modal-content" id="modal-body"></div>
     </div>
-
-    <div id="toast">Reward Added!</div>
+    <div id="toast"></div>
 
     <script>
-        let state = {
-            coins: parseInt(localStorage.getItem('ce_coins')) || 0,
-            isCooldown: false
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMnRHLDNE5tFetiA2xL2Da9LyGNCzXE5A",
+            authDomain: "earningapp-9fe93.firebaseapp.com",
+            databaseURL: "https://earningapp-9fe93-default-rtdb.firebaseio.com",
+            projectId: "earningapp-9fe93",
+            storageBucket: "earningapp-9fe93.firebasestorage.app",
+            messagingSenderId: "26135116225",
+            appId: "1:26135116225:web:9f361a081fcd64ff145740"
         };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        function initBg() {
-            const bg = document.getElementById('bg-animation');
-            for (let i = 0; i < 15; i++) {
-                const coin = document.createElement('div');
-                coin.className = 'floating-coin';
-                coin.innerHTML = '🪙';
-                coin.style.left = Math.random() * 100 + 'vw';
-                coin.style.animationDelay = Math.random() * 5 + 's';
-                bg.appendChild(coin);
-            }
+        let currentUser = null;
+        const MIN_WITHDRAW_COINS = 1000; // ₹10
+
+        // Auth Logic
+        function toggleAuth() {
+            const login = document.getElementById('login-form');
+            const signup = document.getElementById('signup-form');
+            login.style.display = login.style.display === 'none' ? 'block' : 'none';
+            signup.style.display = signup.style.display === 'none' ? 'block' : 'none';
         }
+
+        async function handleSignup() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const pass = document.getElementById('signup-pass').value;
+
+            try {
+                const res = await auth.createUserWithEmailAndPassword(email, pass);
+                await db.ref('users/' + res.user.uid).set({
+                    name: name,
+                    email: email,
+                    coins: 0,
+                    isBanned: false,
+                    isAdmin: false
+                });
+                showToast("Account Created!");
+            } catch (err) { alert(err.message); }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (err) { alert(err.message); }
+        }
+
+        function handleLogout() { auth.signOut(); location.reload(); }
+
+        // Data Sync
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.ref('users/' + user.uid).on('value', snapshot => {
+                    const data = snapshot.val();
+                    if (data.isBanned) {
+                        alert("You are BANNED!");
+                        auth.signOut();
+                        return;
+                    }
+                    currentUser = data;
+                    currentUser.uid = user.uid;
+                    updateUI();
+                    document.getElementById('auth-container').style.display = 'none';
+                    document.getElementById('main-app').style.display = 'block';
+                    document.getElementById('user-name-display').innerText = "Hi, " + data.name;
+                    
+                    // Show Admin Panel if admin
+                    if(data.isAdmin) document.getElementById('admin-panel').style.display = 'block';
+                });
+            } else {
+                document.getElementById('auth-container').style.display = 'block';
+                document.getElementById('main-app').style.display = 'none';
+            }
+        });
 
         function updateUI() {
-            document.getElementById('coin-display').innerText = state.coins.toLocaleString();
-            document.getElementById('rupee-display').innerText = `₹${(state.coins / 100).toFixed(2)}`;
-            
-            let percent = Math.min((state.coins / 5000) * 100, 100);
-            document.getElementById('main-progress').style.width = percent + '%';
-            document.getElementById('progress-percent').innerText = Math.floor(percent) + '%';
-            
-            localStorage.setItem('ce_coins', state.coins);
+            document.getElementById('coin-display').innerText = currentUser.coins;
+            document.getElementById('rupee-display').innerText = "₹" + (currentUser.coins / 100).toFixed(2);
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }
-
-        function closeModal() {
-            document.getElementById('generic-modal').style.display = 'none';
-        }
-
-        // Logic Functions
-        function watchAd() {
-            if (state.isCooldown) return;
-            const modal = document.getElementById('generic-modal');
-            const body = document.getElementById('modal-body');
-            modal.style.display = 'flex';
-            body.innerHTML = `<h3>Loading Ad...</h3><div class="ad-loader"></div>`;
-            
-            setTimeout(() => {
-                body.innerHTML = `
-                    <div style="height:150px; background:#000; border-radius:15px; display:flex; align-items:center; justify-content:center; margin-bottom:15px;">
-                        <h4 style="color:var(--primary)">AWESOME AD CONTENT</h4>
-                    </div>
-                    <button class="btn-main" onclick="claimAdReward()">Claim 10 Coins</button>
-                `;
-            }, 2000);
-        }
-
-        function claimAdReward() {
-            state.coins += 10;
-            updateUI();
-            closeModal();
-            showToast("+10 Coins!");
-            startCooldown();
-        }
-
-        function startCooldown() {
-            state.isCooldown = true;
-            const btn = document.getElementById('ad-btn');
-            let sec = 30;
-            const timer = setInterval(() => {
-                sec--;
-                btn.disabled = true;
-                btn.innerText = `Wait ${sec}s`;
-                if(sec <= 0) {
-                    clearInterval(timer);
-                    state.isCooldown = false;
-                    btn.disabled = false;
-                    btn.innerText = "Watch Ad & Earn 10 Coins";
-                }
-            }, 1000);
-        }
-
+        // Earning Functions
         function dailyBonus() {
-            const last = localStorage.getItem('ce_last_daily');
-            const today = new Date().toDateString();
-            if(last === today) return showToast("Already claimed today!");
-            state.coins += 50;
-            localStorage.setItem('ce_last_daily', today);
-            updateUI();
-            showToast("Daily Bonus +50!");
+            const lastDaily = localStorage.getItem('last_daily_' + currentUser.uid);
+            if (lastDaily === new Date().toDateString()) return showToast("Already claimed!");
+            
+            db.ref('users/' + currentUser.uid + '/coins').set(currentUser.coins + 50);
+            localStorage.setItem('last_daily_' + currentUser.uid, new Date().toDateString());
+            showToast("+50 Coins!");
         }
 
-        function openSpin() {
-            const modal = document.getElementById('generic-modal');
-            modal.style.display = 'flex';
-            document.getElementById('modal-body').innerHTML = `
-                <h3>Lucky Spin</h3>
-                <div class="wheel-container" id="wheel"></div>
-                <button class="btn-main" onclick="runSpin()">SPIN</button>
-            `;
-        }
-
-        function runSpin() {
-            const wheel = document.getElementById('wheel');
-            const deg = Math.floor(Math.random() * 360) + 1440;
-            wheel.style.transform = `rotate(${deg}deg)`;
+        function watchAd() {
+            showToast("Watching Ad...");
             setTimeout(() => {
-                state.coins += 20;
-                updateUI();
-                showToast("Won 20 Coins!");
-                closeModal();
-            }, 3100);
+                db.ref('users/' + currentUser.uid + '/coins').set(currentUser.coins + 10);
+                showToast("+10 Coins!");
+            }, 3000);
         }
 
-        function openScratch() {
-            const modal = document.getElementById('generic-modal');
-            modal.style.display = 'flex';
-            document.getElementById('modal-body').innerHTML = `
-                <h3>Scratch Card</h3>
-                <div class="scratch-area" onclick="runScratch()">
-                    <div class="scratch-cover" id="cover"></div>
-                    <h2 style="color:var(--primary)">+15</h2>
-                </div>
-            `;
-        }
-
-        function runScratch() {
-            document.getElementById('cover').style.opacity = '0';
-            setTimeout(() => {
-                state.coins += 15;
-                updateUI();
-                showToast("Earned 15 Coins!");
-                closeModal();
-            }, 600);
-        }
-
+        // Withdrawal
         function openWithdraw() {
             const modal = document.getElementById('generic-modal');
-            modal.style.display = 'flex';
             const body = document.getElementById('modal-body');
-            if(state.coins < 5000) {
-                body.innerHTML = `<h3>Need 5,000 Coins</h3><p>You need ${5000-state.coins} more</p><button class="btn-main" onclick="closeModal()" style="margin-top:15px">OK</button>`;
+            modal.style.display = 'flex';
+            
+            if (currentUser.coins < MIN_WITHDRAW_COINS) {
+                body.innerHTML = `<h3>Min Withdrawal ₹10</h3><p>Need 1,000 coins.</p><button onclick="closeModal()" class="btn-main">OK</button>`;
             } else {
-                body.innerHTML = `<h3>Withdraw ₹50</h3><input type="text" placeholder="UPI ID" style="width:100%; padding:10px; margin:15px 0; border-radius:10px;"><button class="btn-main" onclick="completeWithdraw()">Withdraw Now</button>`;
+                body.innerHTML = `<h3>Withdraw ₹${(currentUser.coins/100).toFixed(0)}</h3>
+                <input type="text" id="upi-id" placeholder="Enter UPI ID">
+                <button onclick="processWithdrawal()" class="btn-main">Request Payment</button>`;
             }
         }
 
-        function completeWithdraw() {
-            state.coins -= 5000;
-            updateUI();
-            showToast("Request Sent!");
+        function processWithdrawal() {
+            const upi = document.getElementById('upi-id').value;
+            if(!upi) return alert("Enter UPI ID");
+            
+            db.ref('withdrawals').push({
+                uid: currentUser.uid,
+                email: currentUser.email,
+                amount: currentUser.coins,
+                upi: upi,
+                status: 'pending'
+            });
+            db.ref('users/' + currentUser.uid + '/coins').set(0);
             closeModal();
+            showToast("Request Sent!");
         }
 
-        window.onload = () => { initBg(); updateUI(); };
+        // Admin Functions
+        async function adminAddCoins() {
+            const email = document.getElementById('target-email').value;
+            const amount = parseInt(document.getElementById('add-coins-amount').value);
+            
+            const snapshot = await db.ref('users').orderByChild('email').equalTo(email).once('value');
+            if(snapshot.exists()) {
+                const userId = Object.keys(snapshot.val())[0];
+                const currentCoins = snapshot.val()[userId].coins;
+                db.ref('users/' + userId + '/coins').set(currentCoins + amount);
+                showToast("Updated!");
+            } else { alert("User not found!"); }
+        }
+
+        async function adminBanUser() {
+            const email = document.getElementById('target-email').value;
+            const snapshot = await db.ref('users').orderByChild('email').equalTo(email).once('value');
+            if(snapshot.exists()) {
+                const userId = Object.keys(snapshot.val())[0];
+                db.ref('users/' + userId + '/isBanned').set(true);
+                showToast("User Banned!");
+            }
+        }
+
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            t.innerText = m; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
+        function closeModal() { document.getElementById('generic-modal').style.display = 'none'; }
     </script>
 </body>
 </html>
